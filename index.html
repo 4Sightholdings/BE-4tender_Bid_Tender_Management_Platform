@@ -112,6 +112,28 @@
     .nav-links { display: flex; gap: 24px; align-items: center; color: #dcecff; font-size: 14px; }
     .nav-links a { opacity: 0.86; }
     .nav-links a:hover { opacity: 1; color: var(--cyan); }
+    .nav-note {
+      color: #dcecff;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 12px 18px;
+      border: 1px solid rgba(46,211,255,0.28);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.05);
+      white-space: nowrap;
+    }
+    .hero-note-strong {
+      display: inline-flex;
+      align-items: center;
+      margin-top: 4px;
+      margin-bottom: 14px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      color: #dff7ff;
+      border: 1px solid rgba(46,211,255,0.32);
+      background: rgba(46,211,255,0.10);
+      font-weight: 700;
+    }
 
     .btn {
       display: inline-flex;
@@ -413,11 +435,40 @@
       letter-spacing: 0.04em;
     }
 
+
+    /* IFRAME-SAFE NAVIGATION FIX
+       Keep scrolling available for anchor navigation,
+       but hide the internal scrollbar visually. */
+    html {
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    body {
+      overflow-x: hidden;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+
+    html::-webkit-scrollbar,
+    body::-webkit-scrollbar {
+      width: 0;
+      height: 0;
+      display: none;
+    }
+
+    section,
+    main[id="top"] {
+      scroll-margin-top: 110px;
+    }
+
     @media (max-width: 980px) {
       .hero-grid, .contrast-panel, .cta { grid-template-columns: 1fr; }
       .grid-3 { grid-template-columns: 1fr 1fr; }
       .lifecycle { grid-template-columns: repeat(4,1fr); }
       .nav-links { display: none; }
+      .nav-note { font-size: 12px; padding: 10px 12px; }
       .hero-card { min-height: 560px; }
     }
     @media (max-width: 640px) {
@@ -453,13 +504,9 @@
         <a class="brand" href="#top" aria-label="4Tender home">
           <span class="brand-copy"><strong>4Tender</strong><span>Bid Tender Management</span></span>
         </a>
-        <nav class="nav-links" aria-label="Main navigation">
-          <a href="#problem">Problem</a>
-          <a href="#platform">Platform</a>
-          <a href="#lifecycle">Lifecycle</a>
-          <a href="#governance">Governance</a>
-          <a href="#contact" class="btn btn-secondary">Book a demo</a>
-        </nav>
+        <div class="nav-note" aria-label="Page instruction">
+          Scroll down to complete the enquiry form
+        </div>
       </div>
     </header>
 
@@ -480,10 +527,7 @@
             <div class="eyebrow"><span class="dot"></span> Hosted on Microsoft Azure</div>
             <h1>Procurement without a system is a <span>liability.</span></h1>
             <p class="hero-lead">4Tender turns fragmented tender processes into a controlled, transparent and auditable workflow — from advertised opportunity to awarded contract.</p>
-            <div class="hero-actions">
-              <a class="btn btn-primary" href="#contact">Book a 4Tender demo →</a>
-              <a class="btn btn-secondary" href="#lifecycle">Explore the lifecycle</a>
-            </div>
+            <p class="hero-note hero-note-strong">Scroll down to complete the enquiry form at the bottom of the page.</p>
             <p class="hero-note">Built for organisations that must prove fairness, accountability and compliance.</p>
           </div>
 
@@ -677,11 +721,11 @@
             <h2>Ready to move tender management out of inboxes?</h2>
             <p style="margin-top:16px;">Book a practical walkthrough of 4Tender and see how a governed tender lifecycle can improve transparency, supplier fairness and audit readiness.</p>
             <div class="hero-actions" style="margin-top:26px;">
-              <a class="btn btn-primary" href="mailto:info@4sight.cloud?cc=Prudence.Maleka%404sight.cloud&subject=4Tender%20Demo%20Request&body=Hi%204Sight%20Team%2C%0A%0AI%20would%20like%20to%20book%20a%204Tender%20demo.%0A%0AName%3A%0AOrganisation%3A%0APhone%3A%0AProcurement%20challenge%3A%0A">Email 4Sight →</a>
+              <a class="btn btn-primary" href="mailto:sales@4sight.cloud?cc=Prudence.Maleka%404sight.cloud&subject=4Tender%20Demo%20Request&body=Hi%204Sight%20Team%2C%0A%0AI%20would%20like%20to%20book%20a%204Tender%20demo.%0A%0AName%3A%0AOrganisation%3A%0APhone%3A%0AProcurement%20challenge%3A%0A">Email 4Sight →</a>
               <a class="btn btn-secondary" href="tel:+27126402600">(+27) 012 640 2600</a>
             </div>
           </div>
-          <form class="contact-card" action="mailto:info@4sight.cloud?cc=Prudence.Maleka%404sight.cloud" method="post" enctype="text/plain">
+          <form class="contact-card" action="mailto:sales@4sight.cloud?cc=Prudence.Maleka%404sight.cloud" method="post" enctype="text/plain">
             <label for="name">Name</label>
             <input id="name" name="Name" type="text" placeholder="Your name" />
             <label for="company">Organisation</label>
@@ -695,5 +739,60 @@
       </section>
     </main>
   </div>
+
+  <script>
+    // Robust iframe-friendly navigation.
+    // It keeps the page scrollable, hides the scrollbar with CSS,
+    // and scrolls to the matching section IDs when nav buttons are clicked.
+    (function () {
+      const headerOffset = 112;
+
+      function getTarget(hash) {
+        if (!hash || hash === '#') return null;
+        try {
+          return document.getElementById(hash.replace('#', '')) || document.querySelector(hash);
+        } catch (e) {
+          return null;
+        }
+      }
+
+      function scrollToTarget(hash) {
+        const target = getTarget(hash);
+        if (!target) return;
+
+        const top = target.getBoundingClientRect().top + window.scrollY - headerOffset;
+        const finalTop = Math.max(0, top);
+
+        // Works in normal pages and inside iframes.
+        window.scrollTo({ top: finalTop, behavior: 'smooth' });
+
+        // Fallback for browsers/iframe wrappers that use html/body as the scroller.
+        document.documentElement.scrollTop = finalTop;
+        document.body.scrollTop = finalTop;
+
+        setTimeout(function () {
+          document.documentElement.scrollTop = finalTop;
+          document.body.scrollTop = finalTop;
+        }, 120);
+      }
+
+      document.addEventListener('click', function (event) {
+        const link = event.target.closest('a[href^="#"]');
+        if (!link) return;
+
+        const hash = link.getAttribute('href');
+        const target = getTarget(hash);
+        if (!target) return;
+
+        event.preventDefault();
+        scrollToTarget(hash);
+
+        if (history && history.replaceState) {
+          history.replaceState(null, '', hash);
+        }
+      });
+    })();
+  </script>
+
 </body>
 </html>
